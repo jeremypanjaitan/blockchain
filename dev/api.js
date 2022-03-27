@@ -2,6 +2,9 @@ var express = require("express");
 var app = express();
 const bodyParser = require("body-parser");
 const Blockchain = require("./blockchain");
+const { v4: uuidv4 } = require("uuid");
+
+const nodeAddress = uuidv4().split("-").join("");
 
 const bitcoin = new Blockchain();
 
@@ -21,7 +24,28 @@ app.post("/transaction", (req, res) => {
   res.json({ note: `Transaction will be added in block ${blockIndex}.` });
 });
 
-app.get("/mine", (req, res) => {});
+app.get("/mine", (req, res) => {
+  const lastBlock = bitcoin.getLastBlock();
+  const previousBlockHash = lastBlock["hash"];
+
+  const currentbBlockData = {
+    transactions: bitcoin.pendingTransactions,
+    index: lastBlock["index"] + 1,
+  };
+
+  const nonce = bitcoin.proofOfWork(previousBlockHash, currentbBlockData);
+  const blockHash = bitcoin.hashBlock(
+    previousBlockHash,
+    currentbBlockData,
+    nonce
+  );
+  bitcoin.createNewTransaction(12.5, "00", nodeAddress);
+  const newBlock = bitcoin.createNewBlock(nonce, previousBlockHash, blockHash);
+  res.json({
+    note: "New block mined successfully",
+    block: newBlock,
+  });
+});
 
 app.listen(3000, () => {
   console.log("Listening on port 3000...");
