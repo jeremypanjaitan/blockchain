@@ -83,7 +83,16 @@ app.post("/register-and-broadcast-node", (req, res) => {
     });
 });
 
-app.post("/register-node", (req, res) => {});
+app.post("/register-node", (req, res) => {
+  const newNodeUrl = req.body.newNodeUrl;
+  const nodeNotAlreadyPresent = bitcoin.networkNodes.indexOf(newNodeUrl) === -1;
+  const notCurrentNode = bitcoin.currentNodeUrl !== newNodeUrl;
+  if (nodeNotAlreadyPresent && notCurrentNode) {
+    bitcoin.networkNodes.push(newNodeUrl);
+  }
+
+  res.json({ note: "New note registered successfully" });
+});
 
 app.post("register-node-bulk", (req, res) => {});
 
