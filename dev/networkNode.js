@@ -61,8 +61,8 @@ app.post("/register-and-broadcast-node", (req, res) => {
       method: "POST",
       body: {
         newNodeUrl: newNodeUrl,
-        json: true,
       },
+      json: true,
     };
     rgNodesPromises.push(rp(requestOptions));
   });
@@ -73,8 +73,8 @@ app.post("/register-and-broadcast-node", (req, res) => {
         method: "POST",
         body: {
           allNetworkNodes: [...bitcoin.networkNodes, bitcoin.currentNodeUrl],
-          json: true,
         },
+        json: true,
       };
       return rp(bulkRegisterOptions);
     })
