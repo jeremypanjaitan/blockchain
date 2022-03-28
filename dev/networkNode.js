@@ -5,6 +5,7 @@ const Blockchain = require("./blockchain");
 const { v4: uuidv4 } = require("uuid");
 const port = process.argv[2];
 const rp = require("request-promise");
+const { kill } = require("nodemon/lib/monitor/run");
 
 const nodeAddress = uuidv4().split("-").join("");
 
@@ -18,12 +19,33 @@ app.get("/blockchain", (req, res) => {
 });
 
 app.post("/transaction", (req, res) => {
-  const blockIndex = bitcoin.createNewTransaction(
+  const newTransaction = req.body;
+  const blockIndex =
+    bitcoin.addTransactionToPendingTransactions(newTransaction);
+  res.json({ note: `Transaction will be added in block ${blockIndex}.` });
+});
+
+app.post("/transaction/broadcast", (req, res) => {
+  const newTransaction = bitcoin.createNewTransaction(
     req.body.amount,
     req.body.sender,
     req.body.recipient
   );
-  res.json({ note: `Transaction will be added in block ${blockIndex}.` });
+  bitcoin.addTransactionToPendingTransactions(newTransaction);
+
+  const requestPromises = [];
+  bitcoin.networkNodes.forEach((networkNodeUrl) => {
+    const requestOptions = {
+      uri: networkNodeUrl + "/transaction",
+      method: "POST",
+      body: newTransaction,
+      json: true,
+    };
+    requestPromises.push(rp(requestOptions));
+  });
+  Promise.all(requestPromises).then((data) => {
+    res.json({ note: "Transaction created and broadcast successfully." });
+  });
 });
 
 app.get("/mine", (req, res) => {
