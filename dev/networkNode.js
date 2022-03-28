@@ -52,15 +52,15 @@ app.get("/mine", (req, res) => {
   const lastBlock = bitcoin.getLastBlock();
   const previousBlockHash = lastBlock["hash"];
 
-  const currentbBlockData = {
+  const currentBlockData = {
     transactions: bitcoin.pendingTransactions,
     index: lastBlock["index"] + 1,
   };
 
-  const nonce = bitcoin.proofOfWork(previousBlockHash, currentbBlockData);
+  const nonce = bitcoin.proofOfWork(previousBlockHash, currentBlockData);
   const blockHash = bitcoin.hashBlock(
     previousBlockHash,
-    currentbBlockData,
+    currentBlockData,
     nonce
   );
   const newBlock = bitcoin.createNewBlock(nonce, previousBlockHash, blockHash);
@@ -95,6 +95,26 @@ app.get("/mine", (req, res) => {
         block: newBlock,
       });
     });
+});
+
+app.post("/receive-new-block", (req, res) => {
+  const newBlock = req.body.newBlock;
+  const lastBlock = bitcoin.getLastBlock();
+  const correctHash = lastBlock.hash === newBlock.previousBlockHash;
+  const correctIndex = lastBlock["index"] + 1 === newBlock["index"];
+  if (correctHash && correctIndex) {
+    bitcoin.chain.push(newBlock);
+    bitcoin.pendingTransactions = [];
+    res.json({
+      note: "New block received and accepted.",
+      newBlock: newBlock,
+    });
+  } else {
+    res.json({
+      note: "New block Rejected.",
+      newBlock: newBlock,
+    });
+  }
 });
 
 app.post("/register-and-broadcast-node", (req, res) => {
