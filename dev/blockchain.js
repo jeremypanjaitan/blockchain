@@ -84,7 +84,7 @@ Blockchain.prototype.chainIsValid = function (blockchain) {
   for (var i = 1; i < blockchain.length; i++) {
     const currentBlock = blockchain[i];
     const prevBlock = blockchain[i - 1];
-    const blockHash = this.blockHash(
+    const blockHash = this.hashBlock(
       prevBlock["hash"],
       {
         transactions: currentBlock["transactions"],
