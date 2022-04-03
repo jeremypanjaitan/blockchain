@@ -5,7 +5,6 @@ const Blockchain = require("./blockchain");
 const { v4: uuidv4 } = require("uuid");
 const port = process.argv[2];
 const rp = require("request-promise");
-const { kill } = require("nodemon/lib/monitor/run");
 
 const nodeAddress = uuidv4().split("-").join("");
 
