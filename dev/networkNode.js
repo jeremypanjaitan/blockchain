@@ -231,7 +231,13 @@ app.get("/transaction/:transactionId", (req, res) => {
   });
 });
 
-app.get("/address/:address", (req, res) => {});
+app.get("/address/:address", (req, res) => {
+  const address = req.params.address;
+  const addressData = bitcoin.getAddressData(address);
+  res.json({
+    addressData: addressData,
+  });
+});
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}...`);

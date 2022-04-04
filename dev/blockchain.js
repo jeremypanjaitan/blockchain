@@ -160,7 +160,7 @@ Blockchain.prototype.getAddressData = function (address) {
     if (transaction.recipient === address) {
       balance += transaction.amount;
     } else if (transaction.sender === address) {
-      balance = transaction.amount;
+      balance -= transaction.amount;
     }
   });
   return {
