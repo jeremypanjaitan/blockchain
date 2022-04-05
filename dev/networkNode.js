@@ -239,6 +239,10 @@ app.get("/address/:address", (req, res) => {
   });
 });
 
+app.get("/block-explorer", function (req, res) {
+  res.sendFile("./block-explorer/index.html", { root: __dirname });
+});
+
 app.listen(port, () => {
   console.log(`Listening on port ${port}...`);
 });
